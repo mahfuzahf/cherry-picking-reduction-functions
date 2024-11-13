@@ -1,5 +1,6 @@
 from tqdm import tqdm
 import functions as f
+from math import e, log
 
 
 # class to represent a vanilla rainbow table
@@ -12,6 +13,7 @@ class RainbowTable:
         self.m0 = m0
         self.table = self.init_rainbow_table()
         self.init_rainbow_table()
+        self.cost = 0
 
     # function to initialise a rainbow table
     def init_rainbow_table(self):
@@ -41,6 +43,7 @@ class RainbowTable:
             for a, b in self.table.items():
                 # hash and reduce each the current value
                 x = f.r(f.H(b), i, 0, t, N)
+                self.cost += 1
                 # add this value to seen set
                 seen.add(x)
 
@@ -60,10 +63,13 @@ class RainbowTable:
 
 
 # rainbow table parameters
-N = 2 ** 16  # number of possible plaintexts
+N = 2 ** 20  # number of possible plaintexts
+
+p = 1-e**-2 # our table coverage
+t = round(log(1-p)/log(1-N**(-1/3))) # Calculate t
+
 mt_target = N ** (2 / 3)  # target mt
 maximality_factor = 0.9
-t = 100
 m0 = round(mt_target / (1 - maximality_factor))
 
 # create a rainbow table
@@ -73,3 +79,4 @@ rainbow_table = RainbowTable(N, mt_target, maximality_factor, t, m0)
 rainbow_table.build_rainbow_table()
 
 print(len(rainbow_table.table))
+print(rainbow_table.cost)
