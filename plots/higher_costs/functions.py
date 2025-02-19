@@ -1,6 +1,13 @@
 from math import pi, sqrt
 from statistics import NormalDist
 import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+
+# constants for plotting
+NUM_COLORS = 20
+LINE_STYLES = ['solid', 'dashed', 'dashdot', 'dotted']
+NUM_STYLES = len(LINE_STYLES)
 
 ## define the objective and target functions
 def cost(inputs, N, m_0):  ## the cost calculation function as objective function to be minimized
@@ -106,3 +113,67 @@ def plot_kjs(K_js, m_0, alpha, N):
     ax.set_xlabel("j", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12})
 
     fig.suptitle(f"K curve where $m_0$ = {m_0} ($α$ = {alpha}), N = {N}, t = {len(K_js)}")
+
+
+def plot_kjs_cost(K_js, m_0, alpha, factor):
+    # make filepath
+    filepath = generate_filepath(alpha, factor)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+
+    ax.plot(K_js, "k", label="K")
+    ax.set_ylabel(r"$K_{j}$", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12, "labelpad": -2})
+    ax.set_xlabel("j", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12})
+
+    fig.suptitle(f"K curve where $α$ = {alpha}, bounded by {factor}P(V) - P(C) > 0 ")
+    plt.savefig(filepath)
+    plt.close(fig)
+
+
+def plot_all_kj(results, labels, legend_label, alpha):
+    # get filepath
+    filepath = generate_filepath_all_alpha(alpha)
+    print(filepath)
+
+    # get plot title
+    title = generate_title_all_alpha(alpha)
+
+    # to get different colours
+    sns.reset_orig()  # get default matplotlib styles back
+    clrs = sns.color_palette('husl', n_colors=NUM_COLORS)  # a list of RGB tuples
+
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+
+    # [K_js, m_0, final_cost, m_values]
+    for i, result in enumerate(results):
+        K_js = result[0]
+        label = labels[i]
+        lines = ax.plot(K_js, label=f"{legend_label} = {label}")
+        lines[0].set_color(clrs[i])
+        lines[0].set_linestyle(LINE_STYLES[i % NUM_STYLES])
+
+    ax.set_ylabel(r"$K_{j}$", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12, "labelpad": -2})
+    ax.set_xlabel("j", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12})
+
+    fig.suptitle(title)
+    # Position legend outside the plot (right side)
+    plt.legend(loc="upper left", bbox_to_anchor=(1, 1))
+    # Adjust layout to fit the legend outside
+    plt.tight_layout()
+    plt.savefig(filepath)
+    plt.close(fig)
+
+
+def generate_filepath(alpha, factor):
+    return f"{alpha}_different_costs/K_curve_{alpha}_{factor}.png"
+
+
+def generate_filepath_all_alpha(alpha):
+    return f"{alpha}_different_costs/K_curve_all_alpha_{alpha}_new.png"
+
+
+def generate_title_all_alpha(alpha):
+    return f"K curve where $α$ = {alpha} for different costs"
+
