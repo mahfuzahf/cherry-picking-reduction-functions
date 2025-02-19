@@ -177,3 +177,52 @@ def generate_filepath_all_alpha(alpha):
 def generate_title_all_alpha(alpha):
     return f"K curve where $α$ = {alpha} for different costs"
 
+
+## put all the plots on one figure
+def draw_subplot(ax, results, labels, legend_label, alpha, clrs):
+    # get plot title
+    title = generate_title_all_alpha(alpha)
+
+    # [K_js, m_0, final_cost, m_values]
+    for i, result in enumerate(results):
+        K_js = result[0]
+        label = labels[i]
+        lines = ax.plot(K_js, label=f"{legend_label} = {label}")
+        lines[0].set_color(clrs[i])
+        lines[0].set_linestyle(LINE_STYLES[i % NUM_STYLES])
+
+    ax.set_title(title)
+    ax.set_ylabel(r"$K_{j}$", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12, "labelpad": -2})
+    ax.set_xlabel("j", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12})
+
+
+def plot_all(results, labels, legend_label, alphas):
+
+    # set up the figure with subplots
+    rows, cols = 2, 4  # Define a 2-row, 4-column layout
+    fig, axes = plt.subplots(nrows=rows, ncols=cols, figsize=(24 , 8), sharex=True)
+
+    # to get different colours
+    sns.reset_orig()  # get default matplotlib styles back
+    clrs = sns.color_palette('husl', n_colors=NUM_COLORS)  # a list of RGB tuples
+
+    # Flatten axes array for easy iteration
+    axes = axes.flatten()
+
+    for i, result in enumerate(results):
+        ax = axes[i]
+        draw_subplot(ax, result, labels, legend_label, alphas[i], clrs)
+
+    # Create a single legend from the first subplot
+    legend_lines = [plt.Line2D([0], [0], color=clrs[i], linestyle=LINE_STYLES[i % NUM_STYLES]) for i in range(20)]
+
+    fig.legend(legend_lines, labels, loc="upper right", bbox_to_anchor=(1.2, 1), title=legend_label)
+
+    # Set common x-label
+    axes[-1].set_xlabel("j", fontname="Times New Roman", style="italic", fontsize=12)
+
+    # Adjust layout
+    plt.tight_layout(rect=[0, 0, 0.85, 1])  # Leave space for the legend
+
+    plt.show()
+
