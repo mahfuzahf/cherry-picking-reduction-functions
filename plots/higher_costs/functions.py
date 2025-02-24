@@ -9,6 +9,10 @@ NUM_COLORS = 20
 LINE_STYLES = ['solid', 'dashed', 'dashdot', 'dotted']
 NUM_STYLES = len(LINE_STYLES)
 
+# constants for N
+POWER_20 = 2 ** 20
+POWER_16 = 2 ** 16
+
 ## define the objective and target functions
 def cost(inputs, N, m_0):  ## the cost calculation function as objective function to be minimized
     ### the input variables to find are as follows:
@@ -115,9 +119,9 @@ def plot_kjs(K_js, m_0, alpha, N):
     fig.suptitle(f"K curve where $m_0$ = {m_0} ($α$ = {alpha}), N = {N}, t = {len(K_js)}")
 
 
-def plot_kjs_cost(K_js, m_0, alpha, factor):
+def plot_kjs_cost(N, K_js, m_0, alpha, factor):
     # make filepath
-    filepath = generate_filepath(alpha, factor)
+    filepath = generate_filepath(N, alpha, factor)
 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
@@ -131,10 +135,9 @@ def plot_kjs_cost(K_js, m_0, alpha, factor):
     plt.close(fig)
 
 
-def plot_all_kj(results, labels, legend_label, alpha):
+def plot_all_kj(N, results, labels, legend_label, alpha):
     # get filepath
-    filepath = generate_filepath_all_alpha(alpha)
-    print(filepath)
+    filepath = generate_filepath_all_alpha(N, alpha)
 
     # get plot title
     title = generate_title_all_alpha(alpha)
@@ -166,12 +169,18 @@ def plot_all_kj(results, labels, legend_label, alpha):
     plt.close(fig)
 
 
-def generate_filepath(alpha, factor):
-    return f"{alpha}_different_costs/K_curve_{alpha}_{factor}.png"
+def generate_filepath(N, alpha, factor):
+    if N == POWER_20:
+        return f"{alpha}_different_costs/K_curve_{alpha}_{factor}.png"
+    elif N == POWER_16:
+        return f"N_16/{alpha}/K_curve_{alpha}_{factor}_16.png"
 
 
-def generate_filepath_all_alpha(alpha):
-    return f"{alpha}_different_costs/K_curve_all_alpha_{alpha}_new.png"
+def generate_filepath_all_alpha(N, alpha):
+    if N == POWER_20:
+        return f"{alpha}_different_costs/K_curve_all_alpha_{alpha}_new.png"
+    elif N == POWER_16:
+        return f"N_16/{alpha}/K_curve_all_alpha_{alpha}_16.png"
 
 
 def generate_title_all_alpha(alpha):
@@ -200,7 +209,7 @@ def plot_all(results, labels, legend_label, alphas):
 
     # set up the figure with subplots
     rows, cols = 2, 4  # Define a 2-row, 4-column layout
-    fig, axes = plt.subplots(nrows=rows, ncols=cols, figsize=(24 , 8), sharex=True)
+    fig, axes = plt.subplots(nrows=rows, ncols=cols, figsize=(24 , 8), sharex=False)
 
     # to get different colours
     sns.reset_orig()  # get default matplotlib styles back
@@ -213,16 +222,23 @@ def plot_all(results, labels, legend_label, alphas):
         ax = axes[i]
         draw_subplot(ax, result, labels, legend_label, alphas[i], clrs)
 
+        # if the subplot is not in the first column, remove the y-label
+        if i % cols != 0:
+            ax.set_ylabel(None)
+
+        # if the subplot is not in the last row, remove the x-label
+        if i < (rows - 1) * cols:
+            ax.set_xlabel(None)
+
+    fig.subplots_adjust(right=0.8)  # make space for legend
+
     # Create a single legend from the first subplot
     legend_lines = [plt.Line2D([0], [0], color=clrs[i], linestyle=LINE_STYLES[i % NUM_STYLES]) for i in range(20)]
 
-    fig.legend(legend_lines, labels, loc="upper right", bbox_to_anchor=(1.2, 1), title=legend_label)
+    fig.legend(legend_lines, labels, loc="center left", title=legend_label, bbox_to_anchor=(0.8, 0.5))
 
     # Set common x-label
     axes[-1].set_xlabel("j", fontname="Times New Roman", style="italic", fontsize=12)
-
-    # Adjust layout
-    plt.tight_layout(rect=[0, 0, 0.85, 1])  # Leave space for the legend
 
     plt.show()
 
