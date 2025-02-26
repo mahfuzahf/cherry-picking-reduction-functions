@@ -135,6 +135,30 @@ def plot_kjs_cost(N, K_js, m_0, alpha, factor):
     plt.close(fig)
 
 
+def plot_all_alpha(results, N, factor):
+    # [K_js, m_0, final_cost, m_values]
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+
+    alphas = [0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]
+
+    for i, result in enumerate(results):
+        K_js = result[0]
+        alpha = alphas[i]
+        ax.plot(K_js, label=f"α = {alpha}")
+
+    ax.set_ylabel(r"$K_{j}$", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12, "labelpad": -2})
+    ax.set_xlabel("j", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12})
+
+    n = "$2^{20}$"
+    if N == POWER_16:
+        n = "$2^{16}$"
+
+    fig.suptitle(f"K curve for different alpha, at N = {n} and {factor}P(V) - P(C) > 0")
+    plt.legend()
+    plt.savefig(f"N_16/around_1/{factor}P(V)/K_curve_all_N_{N}.png")
+
+
 def plot_all_kj(N, results, labels, legend_label, alpha):
     # get filepath
     filepath = generate_filepath_all_alpha(N, alpha)
@@ -172,7 +196,9 @@ def plot_all_kj(N, results, labels, legend_label, alpha):
 def generate_filepath(N, alpha, factor):
     if N == POWER_20:
         return f"{alpha}_different_costs/K_curve_{alpha}_{factor}.png"
-    elif N == POWER_16:
+    elif 1 <= factor <= 2:
+        return f"N_16/around_1/{factor}P(V)/K_curve_{alpha}_{factor}.png"
+    elif N == POWER_16 & factor > 2:
         return f"N_16/{alpha}/K_curve_{alpha}_{factor}_16.png"
 
 
@@ -205,7 +231,7 @@ def draw_subplot(ax, results, labels, legend_label, alpha, clrs):
     ax.set_xlabel("j", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12})
 
 
-def plot_all(results, labels, legend_label, alphas):
+def plot_all(N, results, labels, legend_label, alphas):
 
     # set up the figure with subplots
     rows, cols = 2, 4  # Define a 2-row, 4-column layout
