@@ -80,7 +80,9 @@ def m_t(inputs, N, m_0):  ## the m_t function as a target function
 def vanilla_cost(N, m_0, t):
     # keep track of cost
     cost = 0
+    # set m to be the starting m_0
     m = m_0
+    # append m to the list of m_values to be returned
     m_values = [m]
 
     # iterate through each column
@@ -206,7 +208,7 @@ def generate_filepath_all_alpha(N, alpha):
     if N == POWER_20:
         return f"{alpha}_different_costs/K_curve_all_alpha_{alpha}_new.png"
     elif N == POWER_16:
-        return f"N_16/{alpha}/K_curve_all_alpha_{alpha}_16.png"
+        return f"N_16/{alpha}/K_curve_all_alpha_{alpha}_16_ftol_0.01.png"
 
 
 def generate_title_all_alpha(alpha):
