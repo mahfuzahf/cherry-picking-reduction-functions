@@ -144,10 +144,31 @@ def plot_all_alpha(results, N, factor):
 
     alphas = [0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]
 
+    y_vals = []  # keep track of previous y values to check if it is too close to the next one
+
     for i, result in enumerate(results):
         K_js = result[0]
         alpha = alphas[i]
         ax.plot(K_js, label=f"α = {alpha}")
+        y = result[0][-1]  # get the last K_j value to position text
+
+
+        # loop through y_vals
+        for prev_y in y_vals:
+            # if the current y is within 1 of this one
+            if prev_y - 1 < y < prev_y + 1:
+                # if the current y is lower move it down
+                if y < prev_y:
+                    y -= 1.5
+                # else move it up
+                else:
+                    y += 1.5
+
+        y_vals.append(y)  # append to the list
+
+        ax.annotate(round(result[3][-1]), xy=(1,y), xytext=(6,0), color=plt.gca().lines[-1].get_color(), xycoords = ax.get_yaxis_transform(), textcoords="offset points", size=8, va="center")
+
+        prev_y = y  # update the previous y value to current one before next loop
 
     ax.set_ylabel(r"$K_{j}$", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12, "labelpad": -2})
     ax.set_xlabel("j", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12})
@@ -158,7 +179,7 @@ def plot_all_alpha(results, N, factor):
 
     fig.suptitle(f"K curve for different alpha, at N = {n} and {factor}P(V) - P(C) > 0")
     plt.legend()
-    plt.savefig(f"N_16/around_1/{factor}P(V)/K_curve_all_N_{N}.png")
+    plt.savefig(f"N_16/around_1/{factor}P(V)/K_curve_all_N_{N}_new_op.png")
 
 
 def plot_all_kj(N, results, labels, legend_label, alpha):
@@ -197,18 +218,18 @@ def plot_all_kj(N, results, labels, legend_label, alpha):
 
 def generate_filepath(N, alpha, factor):
     if N == POWER_20:
-        return f"{alpha}_different_costs/K_curve_{alpha}_{factor}.png"
+        return f"{alpha}_different_costs/K_curve_{alpha}_{factor}_new_op.png"
     elif 1 <= factor <= 2:
-        return f"N_16/around_1/{factor}P(V)/K_curve_{alpha}_{factor}.png"
+        return f"N_16/around_1/{factor}P(V)/K_curve_{alpha}_{factor}_new_op.png"
     elif N == POWER_16 & factor > 2:
-        return f"N_16/{alpha}/K_curve_{alpha}_{factor}_16.png"
+        return f"N_16/{alpha}/K_curve_{alpha}_{factor}_16_new_op.png"
 
 
 def generate_filepath_all_alpha(N, alpha):
     if N == POWER_20:
-        return f"{alpha}_different_costs/K_curve_all_alpha_{alpha}_new.png"
+        return f"{alpha}_different_costs/K_curve_all_alpha_{alpha}_new_op.png"
     elif N == POWER_16:
-        return f"N_16/{alpha}/K_curve_all_alpha_{alpha}_16_ftol_0.01.png"
+        return f"N_16/{alpha}/K_curve_all_alpha_{alpha}_16_ftol_0.01_new_op.png"
 
 
 def generate_title_all_alpha(alpha):
