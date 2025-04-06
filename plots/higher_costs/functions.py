@@ -179,7 +179,7 @@ def plot_all_alpha(results, N, factor):
 
     fig.suptitle(f"K curve for different alpha, at N = {n} and {factor}P(V) - P(C) > 0")
     plt.legend()
-    plt.savefig(f"N_16/around_1/{factor}P(V)/K_curve_all_N_{N}_new_op.png")
+    plt.savefig(f"N_16/around_1/{factor}P(V)/K_curve_all_N_16_new_op_bound_10_new_tol.png")
 
 
 def plot_all_kj(N, results, labels, legend_label, alpha):
@@ -220,16 +220,16 @@ def generate_filepath(N, alpha, factor):
     if N == POWER_20:
         return f"{alpha}_different_costs/K_curve_{alpha}_{factor}_new_op.png"
     elif 1 <= factor <= 2:
-        return f"N_16/around_1/{factor}P(V)/K_curve_{alpha}_{factor}_new_op.png"
+        return f"N_16/around_1/{factor}P(V)/K_curve_{alpha}_{factor}_new_op_lower_bound_2.png"
     elif N == POWER_16 & factor > 2:
-        return f"N_16/{alpha}/K_curve_{alpha}_{factor}_16_new_op.png"
+        return f"N_16/{alpha}/K_curve_{alpha}_{factor}_16_new_op_bound_5.png"
 
 
 def generate_filepath_all_alpha(N, alpha):
     if N == POWER_20:
         return f"{alpha}_different_costs/K_curve_all_alpha_{alpha}_new_op.png"
     elif N == POWER_16:
-        return f"N_16/{alpha}/K_curve_all_alpha_{alpha}_16_ftol_0.01_new_op.png"
+        return f"N_16/{alpha}/K_curve_all_alpha_{alpha}_new_op_lower_bound_2.png"
 
 
 def generate_title_all_alpha(alpha):
@@ -249,6 +249,16 @@ def draw_subplot(ax, results, labels, legend_label, alpha, clrs):
         lines[0].set_color(clrs[i])
         lines[0].set_linestyle(LINE_STYLES[i % NUM_STYLES])
 
+        # annotate the m_t value for each line in the plot
+        y = result[0][-1]  # get the last K_j value to position text
+
+        ax.annotate(round(result[3][-1]),
+                    xy=(1, y),
+                    xytext=(6, 0),
+                    color=clrs[i],
+                    xycoords=ax.get_yaxis_transform(), textcoords="offset points", size=8, va="center")
+
+
     ax.set_title(title)
     ax.set_ylabel(r"$K_{j}$", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12, "labelpad": -2})
     ax.set_xlabel("j", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12})
@@ -258,7 +268,7 @@ def plot_all(N, results, labels, legend_label, alphas):
 
     # set up the figure with subplots
     rows, cols = 2, 4  # Define a 2-row, 4-column layout
-    fig, axes = plt.subplots(nrows=rows, ncols=cols, figsize=(24 , 8), sharex=False)
+    fig, axes = plt.subplots(nrows=rows, ncols=cols, figsize=(24 , 12), sharex=False)
 
     # to get different colours
     sns.reset_orig()  # get default matplotlib styles back
@@ -279,15 +289,19 @@ def plot_all(N, results, labels, legend_label, alphas):
         if i < (rows - 1) * cols:
             ax.set_xlabel(None)
 
-    fig.subplots_adjust(right=0.8)  # make space for legend
+    fig.subplots_adjust(right=1.1)  # make space for legend
+
+    # Set common x-label
+    axes[-1].set_xlabel("j", fontname="Times New Roman", style="italic", fontsize=12)
+
 
     # Create a single legend from the first subplot
     legend_lines = [plt.Line2D([0], [0], color=clrs[i], linestyle=LINE_STYLES[i % NUM_STYLES]) for i in range(20)]
 
-    fig.legend(legend_lines, labels, loc="center left", title=legend_label, bbox_to_anchor=(0.8, 0.5))
+    # fig.legend(legend_lines, labels, loc="center left", title=legend_label, bbox_to_anchor=(0.8, 0.5))
 
-    # Set common x-label
-    axes[-1].set_xlabel("j", fontname="Times New Roman", style="italic", fontsize=12)
+    fig.legend(legend_lines, labels, loc="center left", title=legend_label, bbox_to_anchor=(1.12, 0.5))
+
 
     plt.show()
 
