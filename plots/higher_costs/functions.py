@@ -123,7 +123,7 @@ def plot_kjs(K_js, m_0, alpha, N):
 
 def plot_kjs_cost(N, K_js, m_0, alpha, factor):
     # make filepath
-    filepath = generate_filepath(N, alpha, factor)
+    # filepath = generate_filepath(N, alpha, factor)
 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
@@ -133,7 +133,7 @@ def plot_kjs_cost(N, K_js, m_0, alpha, factor):
     ax.set_xlabel("j", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12})
 
     fig.suptitle(f"K curve where $α$ = {alpha}, bounded by {factor}P(V) - P(C) > 0 ")
-    plt.savefig(filepath)
+    # plt.savefig(filepath)
     plt.close(fig)
 
 
@@ -179,12 +179,12 @@ def plot_all_alpha(results, N, factor):
 
     fig.suptitle(f"K curve for different alpha, at N = {n} and {factor}P(V) - P(C) > 0")
     plt.legend()
-    plt.savefig(f"N_16/around_1/{factor}P(V)/K_curve_all_N_16_new_op_bound_10_new_tol.png")
+    # plt.savefig(f"N_16/around_1/{factor}P(V)/factor_{factor}_5_column_lowerbound_5.png")
 
 
 def plot_all_kj(N, results, labels, legend_label, alpha):
     # get filepath
-    filepath = generate_filepath_all_alpha(N, alpha)
+    # filepath = generate_filepath_all_alpha(N, alpha)
 
     # get plot title
     title = generate_title_all_alpha(alpha)
@@ -212,24 +212,24 @@ def plot_all_kj(N, results, labels, legend_label, alpha):
     plt.legend(loc="upper left", bbox_to_anchor=(1, 1))
     # Adjust layout to fit the legend outside
     plt.tight_layout()
-    plt.savefig(filepath)
+    # plt.savefig(filepath)
     plt.close(fig)
 
 
 def generate_filepath(N, alpha, factor):
     if N == POWER_20:
-        return f"{alpha}_different_costs/K_curve_{alpha}_{factor}_new_op.png"
+        return f"{alpha}_different_costs/K_curve_{alpha}_{factor}_5_column_lowerbound_5.png"
     elif 1 <= factor <= 2:
-        return f"N_16/around_1/{factor}P(V)/K_curve_{alpha}_{factor}_new_op_lower_bound_2.png"
+        return f"N_16/around_1/{factor}P(V)/K_curve_{alpha}_{factor}_5_column_lowerbound_5.png"
     elif N == POWER_16 & factor > 2:
-        return f"N_16/{alpha}/K_curve_{alpha}_{factor}_16_new_op_bound_5.png"
+        return f"N_16/{alpha}/K_curve_{alpha}_{factor}_5_column_lowerbound_5.png"
 
 
 def generate_filepath_all_alpha(N, alpha):
     if N == POWER_20:
-        return f"{alpha}_different_costs/K_curve_all_alpha_{alpha}_new_op.png"
+        return f"{alpha}_different_costs/K_curve_all_alpha_{alpha}_5_column_lowerbound_5.png"
     elif N == POWER_16:
-        return f"N_16/{alpha}/K_curve_all_alpha_{alpha}_new_op_lower_bound_2.png"
+        return f"N_16/{alpha}/K_curve_all_alpha_{alpha}_5_column_lowerbound_5.png"
 
 
 def generate_title_all_alpha(alpha):
