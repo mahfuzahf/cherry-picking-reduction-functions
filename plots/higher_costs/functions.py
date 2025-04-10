@@ -110,7 +110,7 @@ def vanilla_cost(N, m_0, t):
     return cost, m_values
 
 
-def plot_kjs(K_js, m_0, alpha, N):
+def plot_kjs(K_js, alpha, bound):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
 
@@ -118,7 +118,7 @@ def plot_kjs(K_js, m_0, alpha, N):
     ax.set_ylabel(r"$K_{j}$", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12, "labelpad": -2})
     ax.set_xlabel("j", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12})
 
-    fig.suptitle(f"K curve where $m_0$ = {m_0} ($α$ = {alpha}), N = {N}, t = {len(K_js)}")
+    fig.suptitle(f"K curve where $α$ = {alpha}, lower bound = {bound},  t = {len(K_js)}")
 
 
 def plot_kjs_cost(N, K_js, m_0, alpha, factor):
@@ -187,7 +187,7 @@ def plot_all_kj(N, results, labels, legend_label, alpha):
     # filepath = generate_filepath_all_alpha(N, alpha)
 
     # get plot title
-    title = generate_title_all_alpha(alpha)
+    # title = generate_title_all_alpha(alpha)
 
     # to get different colours
     sns.reset_orig()  # get default matplotlib styles back
@@ -204,16 +204,27 @@ def plot_all_kj(N, results, labels, legend_label, alpha):
         lines[0].set_color(clrs[i])
         lines[0].set_linestyle(LINE_STYLES[i % NUM_STYLES])
 
+        # annotate the m_t value for each line in the plot
+        y = result[0][-1]  # get the last K_j value to position text
+
+        ax.annotate(round(result[3][-1]),
+                    xy=(1, y),
+                    xytext=(6, 0),
+                    color=clrs[i],
+                    xycoords=ax.get_yaxis_transform(), textcoords="offset points", size=8, va="center")
+
     ax.set_ylabel(r"$K_{j}$", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12, "labelpad": -2})
     ax.set_xlabel("j", **{"fontname": "Times New Roman", "style": "italic", "fontsize": 12})
 
-    fig.suptitle(title)
+    # fig.suptitle(title)
     # Position legend outside the plot (right side)
-    plt.legend(loc="upper left", bbox_to_anchor=(1, 1))
+    # plt.legend(loc="upper left", bbox_to_anchor=(1, 1))
+    plt.legend(loc="upper left", bbox_to_anchor=(1.08, 1))
     # Adjust layout to fit the legend outside
-    plt.tight_layout()
+    # plt.tight_layout()
     # plt.savefig(filepath)
-    plt.close(fig)
+    # plt.close(fig)
+    plt.show()
 
 
 def generate_filepath(N, alpha, factor):
