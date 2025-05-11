@@ -179,6 +179,7 @@ def plot_all_alpha(results, N, factor):
 
     fig.suptitle(f"K curve for different alpha, at N = {n} and {factor}P(V) - P(C) > 0")
     plt.legend()
+
     # plt.savefig(f"N_16/around_1/{factor}P(V)/factor_{factor}_5_column_lowerbound_5.png")
 
 
@@ -193,8 +194,9 @@ def plot_all_kj(N, results, labels, legend_label, alpha):
     sns.reset_orig()  # get default matplotlib styles back
     clrs = sns.color_palette('husl', n_colors=NUM_COLORS)  # a list of RGB tuples
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=(7, 6))
     ax = fig.add_subplot(1, 1, 1)
+    # fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(24, 12), sharex=False)
 
     # [K_js, m_0, final_cost, m_values]
     for i, result in enumerate(results):
@@ -219,11 +221,15 @@ def plot_all_kj(N, results, labels, legend_label, alpha):
     # fig.suptitle(title)
     # Position legend outside the plot (right side)
     # plt.legend(loc="upper left", bbox_to_anchor=(1, 1))
-    plt.legend(loc="upper left", bbox_to_anchor=(1.08, 1))
-    # Adjust layout to fit the legend outside
-    # plt.tight_layout()
-    # plt.savefig(filepath)
-    # plt.close(fig)
+    # plt.legend(title=legend_label, loc="upper left", bbox_to_anchor=(1.08, 1))
+
+    # Create a single legend from the first subplot
+    legend_lines = [plt.Line2D([0], [0], color=clrs[i], linestyle=LINE_STYLES[i % NUM_STYLES]) for i in range(20)]
+
+    # fig.legend(legend_lines, labels, loc="center left", title=legend_label, bbox_to_anchor=(0.8, 0.5))
+
+    fig.legend(legend_lines, labels, loc="center left", title=legend_label, bbox_to_anchor=(0.975, 0.5), fontsize='small')
+
     plt.show()
 
 
