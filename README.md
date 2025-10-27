@@ -1,6 +1,6 @@
 # ~~COMP4027 Research Project~~ Choice of Reduction Functions in Rainbow Tables
 
-This repo is such a mess. Hopefully if you are now reading this I have tidied everything up
+This repo is such a mess. Hopefully by the time you are reading this I have tidied everything up
 
 Branches from research project:
 - bounding_time
