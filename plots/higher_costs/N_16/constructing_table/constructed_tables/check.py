@@ -3,7 +3,7 @@
 # imports
 import pickle
 
-cost_factors = list(range(5, 31, 5))
+cost_factors = list(range(5, 101, 5))
 
 for item in cost_factors:
     with open(f'cherry_indexes_alpha_0.95_t_80_cost_{item}.pkl', 'rb') as f:
