@@ -38,38 +38,75 @@ def calc_true_mt_and_cost(m, k_t, cost):
     return m, actual_cost
 
 
-# place to store costs and simulated m_t values
-m_ts = []
-costs = []
+def replace_data():
+
+    # place to store costs and simulated m_t values
+    m_ts = []
+    costs = []
 
 
-# load in all the tables
-cost_factors = range(5, 71, 5) # cost factors from 5 to 70
+    # load in all the tables
+    cost_factors = range(5, 71, 5) # cost factors from 5 to 70
 
-# load in pickle file with current sim results
+    # load in pickle file with current sim results
+    with open("higher_costs_ftol_1.pickle", "rb") as f:
+        data = pickle.load(f)
+
+    # structure of file
+    # array of different alpha used
+        # for each alpha, array of different costs used
+        # for each cost, array arranged as [Kjs, m_0, final_cost, m_values]
+
+    for i in range(len(cost_factors)):
+        # run function to calculate true m_t and cost
+        true_mt, total_cost = calc_true_mt_and_cost(data[-1][i][3][-1], data[-1][i][0][-1], data[-1][i][2])
+        # store values
+        m_ts.append(round(true_mt))
+        costs.append(total_cost)
+
+    print(m_ts)
+    print(costs)
+
+
+    # now replace simulated_mt and simulated_cost in csv file
+    df = pd.read_csv("results/building/building_table_results.csv")
+
+    df["simulated_mt"] = m_ts
+    df["simulated_cost"] = costs
+
+    df.to_csv("results/building/building_table_results_updated.csv", index=False)
+
+
+# I want to see what the startpoints for the simulations were
+# open the pickle file
 with open("higher_costs_ftol_1.pickle", "rb") as f:
     data = pickle.load(f)
 
-# structure of file
+# get the alpha = 0.95 for different cost factors 
 # array of different alpha used
     # for each alpha, array of different costs used
     # for each cost, array arranged as [Kjs, m_0, final_cost, m_values]
 
-for i in range(len(cost_factors)):
-    # run function to calculate true m_t and cost
-    true_mt, total_cost = calc_true_mt_and_cost(data[-1][i][3][-1], data[-1][i][0][-1], data[-1][i][2])
-    # store values
-    m_ts.append(round(true_mt))
-    costs.append(total_cost)
+for cost_factor_data in data[-1]:
+    m = cost_factor_data[3][-1] # m_value for last column
+    k = cost_factor_data[0][-1] # k_value for last column
+    print("m_t-1:", m)
 
-print(m_ts)
-print(costs)
-
-
-# now replace simulated_mt and simulated_cost in csv file
-df = pd.read_csv("results/building/building_table_results.csv")
-
-df["simulated_mt"] = m_ts
-df["simulated_cost"] = costs
-
-df.to_csv("results/building/building_table_results_updated.csv", index=False)
+    # Calculate E1 and E2
+    E1 = (1 - 1 / N) ** m
+    E2 = (1 - 2 / N) ** m
+    # calculate the statistical average of m_j+1
+    average = N * (1 - E1)
+    print("average:", average)
+    # check if the variance is positive, sometimes error happens because of float calculation on very small values
+    if N * ((N - 1) * E2 + E1 - N * E1 ** 2) < 0:   # this equation gives the variance, so sqrt to get starndard deviation
+        # if it is negative (error), set it to 0
+        sd = 0
+        print("sd: 0")
+    else:
+        # count the statistical variance of m_j+1 otherwise
+        sd = sqrt(N * ((N - 1) * E2 + E1 - N * E1 ** 2))
+        print("sd:", sd)
+    # find the m_j+1
+    m = average + NormalDist().inv_cdf((k - pi / 8) / (k - pi / 4 + 1)) * sd
+    print("calculated m_t:", m)

@@ -62,14 +62,14 @@ def m_t(inputs, N, m_0):  ## the m_t function as a target function
         # calculate the statistical average of m_j+1
         average = N * (1 - E1)
         # check if the variance is positive, sometimes error happens because of float calculation on very small values
-        if N * ((N - 1) * E2 + E1 - N * E1 ** 2) < 0:
+        if N * ((N - 1) * E2 + E1 - N * E1 ** 2) < 0:   # this equation gives the variance, so sqrt to get starndard deviation
             # if it is negative (error), set it to 0
-            variance = 0
+            sd = 0
         else:
             # count the statistical variance of m_j+1 otherwise
-            variance = sqrt(N * ((N - 1) * E2 + E1 - N * E1 ** 2))
+            sd = sqrt(N * ((N - 1) * E2 + E1 - N * E1 ** 2))
         # find the m_j+1
-        m = average + NormalDist().inv_cdf((k - pi / 8) / (k - pi / 4 + 1)) * variance
+        m = average + NormalDist().inv_cdf((k - pi / 8) / (k - pi / 4 + 1)) * sd
 
     # return -m to maximise the amount of points with optimiser
     return -m
