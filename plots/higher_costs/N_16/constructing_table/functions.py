@@ -2,7 +2,9 @@ from math import pi, sqrt
 from statistics import NormalDist
 import matplotlib.pyplot as plt
 import seaborn as sns
-import numpy as np
+from hashlib import sha256
+from tqdm import tqdm
+import pickle
 
 # constants for plotting
 NUM_COLORS = 20
@@ -12,6 +14,8 @@ NUM_STYLES = len(LINE_STYLES)
 # constants for N
 POWER_20 = 2 ** 20
 POWER_16 = 2 ** 16
+
+##############################################################################################################################
 
 ## define the objective and target functions
 def cost(inputs, N, m_0):  ## the cost calculation function as objective function to be minimized
@@ -45,6 +49,39 @@ def cost(inputs, N, m_0):  ## the cost calculation function as objective functio
     # return cost - not square rooted as we are bounding cost
     return cost, m_values
 
+def cost_altered_for_vanilla(inputs, N, m_0):  ## the cost calculation function as objective function to be minimized
+    ### the input variables to find are as follows:
+    # input[0] is the number of starting points
+    # input[1:] is the K_j for all 1<=j<=t
+    K_js = inputs[1:]  # K_j values
+    cost = 0  # cost counter
+    m_values = [m_0]  # list to keep the mj values
+    m = m_0
+
+    for k in K_js:  # iterate through the column
+        # Calculate E1 and E2
+        E1 = (1 - 1 / N) ** m
+        E2 = (1 - 2 / N) ** m
+        # calculate the statistical average of m_j+1
+        average = N * (1 - E1)
+        ## check if the variance is positive, sometimes error happens because of float calculation on very small values
+        if N * ((N - 1) * E2 + E1 - N * E1 ** 2) < 0:
+            # if it is negative (error), set it to 0
+            variance = 0
+        else:
+            # count the variance otherwise
+            variance = sqrt(N * ((N - 1) * E2 + E1 - N * E1 ** 2))
+        # count the cost before defining the new m
+        cost += m
+        # find the m_j+1
+        m = average + NormalDist().inv_cdf((k - pi / 8) / (k - pi / 4 + 1)) * variance
+        m_values.append(m)
+        
+    # alter cost to include final column as well
+
+    # return cost - not square rooted as we are bounding cost
+    return cost, m_values
+
 
 def m_t(inputs, N, m_0):  ## the m_t function as a target function
     ### the input variables to find are as follows:
@@ -74,6 +111,20 @@ def m_t(inputs, N, m_0):  ## the m_t function as a target function
     # return -m to maximise the amount of points with optimiser
     return -m
 
+def m_t_vanilla(inputs, N, m_0):  ## the m_t function as a target function
+    ### the input variables to find are as follows:
+    # input[0] is the number of starting points
+    # input[1:] is the K_j for all 1<=j<=t
+
+    K_js = inputs[1:]  # K_j values
+    m = m_0  # starting m value
+
+    # m_i = 2N / (i + (2N / m_0))
+    for i in range(len(K_js)):  # iterate through the columns
+        m = (2 * N) / ((i+1) + ((2 * N) / m_0))
+
+    # return -m to maximise the amount of points with optimiser
+    return -m
 
 # function to get cost of vanilla rainbow table
 def vanilla_cost(N, m_0, t):
@@ -107,6 +158,75 @@ def vanilla_cost(N, m_0, t):
         m_values.append(m)
 
     return cost, m_values
+
+##############################################################################################################################
+
+# Hash function
+def H(x):
+	return int.from_bytes(sha256(x.to_bytes(8)).digest())
+
+# Reduction function
+# currently mod but should change to murmurhash in future
+def r(N, t, y, i, ell=0):   # also takes in ell - number of tables - for future use (but currently ell=0)
+	return (y + i + ell*t) % N
+
+# take in m_0 and t as parameters - how many chains to start with and how long to make the chains
+# store the table as a dictionary of endpoint:startpoint pairs (rather than sp:ep for easier lookup later)
+# store in a pickle file
+
+def build_vanilla_table(N, t, startpoints, filename="False"):
+    # store table in dictionary
+    table = {}
+
+    # for each startpoint
+    for sp in tqdm(startpoints):
+        current_point = sp  # keep track of current point in chain -  we want to store startpoint later
+
+        # create the chain
+        for i in range(t):
+            # hash then reduce the value
+            current_point = r(N, t, H(current_point), i)
+
+        # check if there wasn't a chain merge (not in a value stored already) - if not then store in table
+        if current_point not in table:
+            table[current_point] = sp
+
+    # store the table as a pickle file
+    if (filename != "False"):
+        with open(filename, 'wb') as f:
+            pickle.dump(table, f)
+
+    return table
+
+def build_vanilla_table_with_costs(N, t, startpoints, filename="False"):
+    # store table in dictionary
+    table = {}
+    hashes = 0
+    reductions = 0
+
+    # for each startpoint
+    for sp in tqdm(startpoints):
+        current_point = sp  # keep track of current point in chain -  we want to store startpoint later
+
+        # create the chain
+        for i in range(t):
+            # hash then reduce the value
+            current_point = r(N, t, H(current_point), i)
+            hashes += 1
+            reductions += 1
+
+        # check if there wasn't a chain merge (not in a value stored already) - if not then store in table
+        if current_point not in table:
+            table[current_point] = sp
+
+    # store the table as a pickle file
+    if (filename != "False"):
+        with open(filename, 'wb') as f:
+            pickle.dump(table, f)
+
+    return table, hashes, reductions
+
+##############################################################################################################################
 
 
 def plot_kjs(K_js, alpha, bound):
