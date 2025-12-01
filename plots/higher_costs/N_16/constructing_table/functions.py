@@ -99,7 +99,7 @@ def m_t(inputs, N, m_0):  ## the m_t function as a target function
         # calculate the statistical average of m_j+1
         average = N * (1 - E1)
         # check if the variance is positive, sometimes error happens because of float calculation on very small values
-        if N * ((N - 1) * E2 + E1 - N * E1 ** 2) < 0:   # this equation gives the variance, so sqrt to get starndard deviation
+        if N * ((N - 1) * E2 + E1 - N * E1 ** 2) < 0:   # this equation gives the variance, so sqrt to get standard deviation
             # if it is negative (error), set it to 0
             sd = 0
         else:
@@ -120,8 +120,9 @@ def m_t_vanilla(inputs, N, m_0):  ## the m_t function as a target function
     m = m_0  # starting m value
 
     # m_i = 2N / (i + (2N / m_0))
-    for i in range(len(K_js)):  # iterate through the columns
-        m = (2 * N) / ((i+1) + ((2 * N) / m_0))
+    # TODO: don't need to loop here
+    # for i in range(len(K_js)):  # iterate through the columns
+    m = (2 * N) / ((len(K_js)) + ((2 * N) / m_0))
 
     # return -m to maximise the amount of points with optimiser
     return -m
