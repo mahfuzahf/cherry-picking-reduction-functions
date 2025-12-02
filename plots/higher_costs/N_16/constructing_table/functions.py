@@ -6,6 +6,7 @@ import seaborn as sns
 from hashlib import sha256
 from tqdm import tqdm
 import pickle
+import mmh3
 
 # constants for plotting
 NUM_COLORS = 20
@@ -178,6 +179,12 @@ def H(x):
 def r(N, t, y, i, ell=0):   # also takes in ell - number of tables - for future use (but currently ell=0)
 	return (y + i + ell*t) % N
 
+def H_c(x):
+    return sha256(x.to_bytes(8, 'little')).digest()  # return bytes directly
+
+def r_c(N, t, y, i, ell=0):
+    return mmh3.hash(y, i + ell*t, signed=False) % N
+
 # take in m_0 and t as parameters - how many chains to start with and how long to make the chains
 # store the table as a dictionary of endpoint:startpoint pairs (rather than sp:ep for easier lookup later)
 # store in a pickle file
@@ -237,7 +244,7 @@ def build_vanilla_table_with_costs(N, t, startpoints, filename="False"):
 
 # build cherry table - store how many hashes and reductions are done
 # returns: cherry table, indexes, no. hashes, no. reductions, time to build
-def build_cherry_table(N, t,startpoints, Kis):
+def build_cherry_table(N, t, startpoints, Kis):
     # parameters to store how many hashes and reductions are done, as well as actual time it takes to make this table
     hashes = 0
     reductions = 0
@@ -262,7 +269,7 @@ def build_cherry_table(N, t,startpoints, Kis):
         best_trial = -1
 
         # hash all current points then store with startpoints - this stores all our current points
-        hashed_points = {H(mi): sp for mi, sp in table.items()}
+        hashed_points = {H_c(mi): sp for mi, sp in table.items()}
         hashes += (len(startpoints))    # increment hashes count
 
         # we are going to continuously replace table with the best rf trial, so we empty it for now
@@ -282,7 +289,7 @@ def build_cherry_table(N, t,startpoints, Kis):
             # go through each key in hashed_points and store its reduction with sp
             for x in hashed_points:
                 # reduce the hash and store in column
-                trial_column[r(N, t, x, rf_trial)] = hashed_points[x]
+                trial_column[r_c(N, t, x, rf_trial)] = hashed_points[x]
                 reductions += 1
 
             # if trial_column is bigger than current table stored, we replace it
