@@ -1,5 +1,6 @@
 from math import pi, sqrt
 from statistics import NormalDist
+import time
 import matplotlib.pyplot as plt
 import seaborn as sns
 from hashlib import sha256
@@ -141,22 +142,28 @@ def vanilla_cost(N, m_0, t):
         # calculate cost - add 1 for each hash we do (m hashes in this column)
         cost = cost + m
 
-        # Calculate E1 and E2
-        E1 = (1 - 1 / N) ** m
-        E2 = (1 - 2 / N) ** m
-        average = N * (1 - E1)
-
-        # check variance
-        if N * ((N - 1) * E2 + E1 - N * E1 ** 2) < 0:
-            # if it is negative (error), set it to 0
-            variance = 0
-        else:
-            # count the variance otherwise
-            variance = sqrt(N * ((N - 1) * E2 + E1 - N * E1 ** 2))
-
-        # find the m_j+1
-        m = average + NormalDist().inv_cdf((1 - pi / 8) / (1 - pi / 4 + 1)) * variance
+        # use formula m_i+1 = N(1 - (1 - 1/N)^m_i)
+        m = N * (1 - ((1 - (1 / N)) ** m))
         m_values.append(m)
+
+
+
+        # # Calculate E1 and E2
+        # E1 = (1 - 1 / N) ** m
+        # E2 = (1 - 2 / N) ** m
+        # average = N * (1 - E1)
+
+        # # check variance
+        # if N * ((N - 1) * E2 + E1 - N * E1 ** 2) < 0:
+        #     # if it is negative (error), set it to 0
+        #     variance = 0
+        # else:
+        #     # count the variance otherwise
+        #     variance = sqrt(N * ((N - 1) * E2 + E1 - N * E1 ** 2))
+
+        # # find the m_j+1
+        # m = average + NormalDist().inv_cdf((1 - pi / 8) / (1 - pi / 4 + 1)) * variance
+        # m_values.append(m)
 
     return cost, m_values
 
@@ -226,6 +233,74 @@ def build_vanilla_table_with_costs(N, t, startpoints, filename="False"):
             pickle.dump(table, f)
 
     return table, hashes, reductions
+
+
+# build cherry table - store how many hashes and reductions are done
+# returns: cherry table, indexes, no. hashes, no. reductions, time to build
+def build_cherry_table(N, t,startpoints, Kis):
+    # parameters to store how many hashes and reductions are done, as well as actual time it takes to make this table
+    hashes = 0
+    reductions = 0
+    duration = 0
+
+    # start monitoring time
+    start = time.perf_counter()
+
+
+    # store table in dictionary
+    # initialise the table with sp:sp pairs
+    table = {sp: sp for sp in startpoints}  # store all the points then remove duplicate entries - can't do duplicate keys in dictionary anyway so we can just store all ep:sp
+
+    # Instead of making the table chain by chain, we have to make it column by column to test what reduction function to choose
+    # store reduction function indexes
+    rf_indexes = []
+
+    # for each column
+    for i in tqdm(range(t), desc=f"Calculating columns: "):
+
+        # variable to store best cherry-pick
+        best_trial = -1
+
+        # hash all current points then store with startpoints - this stores all our current points
+        hashed_points = {H(mi): sp for mi, sp in table.items()}
+        hashes += (len(startpoints))    # increment hashes count
+
+        # we are going to continuously replace table with the best rf trial, so we empty it for now
+            # we haven't lost the current points as we have them hashed in the hashed_points dictionary
+        table = {}
+
+        # get # cherry-picks for this column
+        k_i = round(Kis[i])
+
+        # trial all the reduction functions for this column
+        # for rf_trial in tqdm(range(k_i), desc=f"Choosing best RF: "):
+        for rf_trial in range(k_i):
+
+            # create a trial column to store results of current trial
+            trial_column = {}
+
+            # go through each key in hashed_points and store its reduction with sp
+            for x in hashed_points:
+                # reduce the hash and store in column
+                trial_column[r(N, t, x, rf_trial)] = hashed_points[x]
+                reductions += 1
+
+            # if trial_column is bigger than current table stored, we replace it
+            if len(trial_column) > len(table):
+                # replace it 
+                table = trial_column
+                # replace best cherry-pick
+                best_trial = rf_trial
+
+        # now store the best rf cherry pick
+        rf_indexes.append(best_trial)
+
+
+    # finished making table so stop recording time
+    duration = time.perf_counter() - start
+
+    # finished, so return table and rf indexes
+    return table, rf_indexes, hashes, reductions, duration
 
 ##############################################################################################################################
 
