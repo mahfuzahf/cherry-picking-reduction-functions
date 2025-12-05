@@ -121,10 +121,9 @@ def m_t_vanilla(inputs, N, m_0):  ## the m_t function as a target function
     K_js = inputs[1:]  # K_j values
     m = m_0  # starting m value
 
-    # m_i = 2N / (i + (2N / m_0))
-    # TODO: don't need to loop here
-    # for i in range(len(K_js)):  # iterate through the columns
-    m = (2 * N) / ((len(K_js)) + ((2 * N) / m_0))
+    
+    for i in range(len(K_js)):
+        m = N(1 - (1 - (1/N)^m))
 
     # return -m to maximise the amount of points with optimiser
     return -m
