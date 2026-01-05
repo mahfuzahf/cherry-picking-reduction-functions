@@ -6,6 +6,8 @@ from math import log, pi, sqrt
 from statistics import NormalDist
 from scipy.optimize import minimize, Bounds
 import pickle
+import numpy as np
+import random
 
 ###############################################################################################################################
 
@@ -34,6 +36,11 @@ def build_cherry_table(N, t, startpoints, Kis):
     hashes = 0
     reductions = 0
     duration = 0
+
+    # get parameters for reduction function search
+    t_bits = (t-1).bit_length() # number of bits to represent t
+    k_bits = 32 - t_bits  # number of bits to represent rf index
+    max_k_index = 2**k_bits  # maximum number of reduction functions per column
 
     # start monitoring time
     start = time.perf_counter()
@@ -64,9 +71,12 @@ def build_cherry_table(N, t, startpoints, Kis):
         # get # cherry-picks for this column
         k_i = round(Kis[i])
 
+        # get indexes to trial
+        pick_sample = np.array(random.sample(range(max_k_index), k_i), dtype=np.uint32)
+        index_sample = (i << k_bits) | pick_sample
+
         # trial all the reduction functions for this column
-        # for rf_trial in tqdm(range(k_i), desc=f"Choosing best RF: "):
-        for rf_trial in range(k_i):
+        for rf_trial in index_sample:
 
             # create a trial column to store results of current trial
             trial_column = {}
