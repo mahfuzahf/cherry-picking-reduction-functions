@@ -24,7 +24,8 @@ def H_c(x):
     return sha256(x.to_bytes(8, 'little')).digest()  # return bytes directly
 
 def r_c(N, t, y, i, ell=0):
-    return mmh3.hash(y, i + ell*t, signed=False) % N
+    seed = int(i) + (ell*t)
+    return mmh3.hash(y, seed, signed=False) % N
 
 ###############################################################################################################################
 
