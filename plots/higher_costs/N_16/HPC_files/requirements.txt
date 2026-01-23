@@ -1,0 +1,56 @@
+asttokens @ file:///C:/Users/dev-admin/buildout/croot/asttokens_1759955575391/work
+Bottleneck @ file:///C:/miniconda3/conda-bld/bottleneck_1761938212172/work
+colorama @ file:///C:/Users/dev-admin/buildout/croot/colorama_1759952627215/work
+comm @ file:///C:/Users/dev-admin/buildout/croot/comm_1763637613849/work
+contourpy @ file:///C:/miniconda3/conda-bld/contourpy_1763643941183/work
+cycler @ file:///tmp/build/80754af9/cycler_1637851556182/work
+debugpy @ file:///C:/miniconda3/conda-bld/debugpy_1762421656989/work
+decorator @ file:///C:/Users/dev-admin/buildout/croot/decorator_1759956412694/work
+executing @ file:///C:/Users/dev-admin/buildout/croot/executing_1761985455628/work
+fonttools @ file:///C:/Users/dev-admin/buildout/croot/fonttools_1761940971547/work
+ipykernel @ file:///C:/miniconda3/conda-bld/ipykernel_1762946091833/work
+ipython @ file:///C:/miniconda3/conda-bld/ipython_1762789318352/work
+ipython_pygments_lexers @ file:///C:/Users/dev-admin/buildout/croot/ipython_pygments_lexers_1759956485878/work
+jedi @ file:///C:/Users/dev-admin/buildout/croot/jedi_1759956512541/work
+joblib @ file:///C:/Users/dev-admin/buildout/croot/joblib_1761941214037/work
+jupyter_client @ file:///C:/miniconda3/conda-bld/jupyter_client_1762943104310/work
+jupyter_core @ file:///C:/miniconda3/conda-bld/jupyter_core_1762854775045/work
+kiwisolver @ file:///C:/miniconda3/conda-bld/kiwisolver_1764159361484/work
+matplotlib==3.10.6
+matplotlib-inline @ file:///C:/miniconda3/conda-bld/matplotlib-inline_1762779269415/work
+mkl-service==2.5.2
+mkl_fft @ file:///C:/miniconda3/conda-bld/mkl_fft_1761592920453/work
+mkl_random @ file:///C:/miniconda3/conda-bld/mkl_random_1761593081220/work
+mmh3 @ file:///C:/Users/dev-admin/buildout/croot/mmh3_1760004580280/work
+nest-asyncio @ file:///tmp/build/80754af9/nest-asyncio_1613680548246/work
+numexpr @ file:///C:/miniconda3/conda-bld/numexpr_1762165726164/work
+numpy @ file:///C:/miniconda3/conda-bld/numpy_and_numpy_base_1762528516533/work/dist/numpy-2.3.4-cp314-cp314-win_amd64.whl#sha256=43bd4e704e50bb4093d40ab2f06efc0a326cf9254b914c3510471aa94cb86373
+packaging @ file:///C:/miniconda3/conda-bld/packaging_1761049098810/work
+pandas @ file:///C:/miniconda3/conda-bld/pandas_1762332435977/work/dist/pandas-2.3.3-cp314-cp314-win_amd64.whl#sha256=ac6b8c30836d425b7de9199ad67d79b5d4d36663122fd5a70d81bfc894c0da42
+parso @ file:///C:/miniconda3/conda-bld/parso_1762781931209/work
+pillow @ file:///C:/Users/dev-admin/buildout/croot/pillow_1762547797675/work
+platformdirs @ file:///C:/miniconda3/conda-bld/platformdirs_1762356618739/work
+prompt_toolkit @ file:///C:/miniconda3/conda-bld/prompt-toolkit_1761745044554/work
+psutil @ file:///C:/miniconda3/conda-bld/psutil_1761896536168/work
+pure_eval @ file:///C:/Users/dev-admin/buildout/croot/pure_eval_1759956052992/work
+Pygments @ file:///C:/Users/dev-admin/buildout/croot/pygments_1762546955213/work
+pyparsing @ file:///C:/miniconda3/conda-bld/pyparsing_1763973805642/work
+PyQt6==6.9.1
+PyQt6_sip @ file:///C:/Users/dev-admin/buildout/croot/pyqt-split_1759966266962/work/pyqt_sip
+python-dateutil @ file:///C:/Users/dev-admin/buildout/croot/python-dateutil_1759954839763/work
+pytz @ file:///C:/Users/dev-admin/buildout/croot/pytz_1759958332927/work
+pywin32 @ file:///C:/Users/dev-admin/buildout/croot/pywin32_1759953972432/work
+pyzmq @ file:///C:/miniconda3/conda-bld/pyzmq_1762375620799/work
+scikit-learn @ file:///C:/miniconda3/conda-bld/scikit-learn_1764838223804/work
+scipy @ file:///C:/Users/dev-admin/buildout/croot/scipy_1761941865376/work/dist/scipy-1.16.2-cp314-cp314-win_amd64.whl#sha256=41b54062e21b75ec4204164f0fed8ff5a0e7a8d85b07ebfb875967d266e33437
+seaborn @ file:///C:/Users/dev-admin/buildout/croot/seaborn_1762566511451/work
+setuptools==80.9.0
+sip @ file:///C:/Users/dev-admin/buildout/croot/sip_1761943990339/work
+six @ file:///C:/Users/dev-admin/buildout/croot/six_1759954493303/work
+stack_data @ file:///C:/Users/dev-admin/buildout/croot/stack_data_1759957300617/work
+threadpoolctl @ file:///C:/miniconda3/conda-bld/threadpoolctl_1764361788517/work
+tornado @ file:///C:/Users/dev-admin/buildout/croot/tornado_1759954992390/work
+tqdm @ file:///C:/miniconda3/conda-bld/tqdm_1762863371227/work
+traitlets @ file:///C:/Users/dev-admin/buildout/croot/traitlets_1759954525269/work
+tzdata @ file:///croot/python-tzdata_1746123641790/work
+wcwidth @ file:///C:/Users/dev-admin/buildout/croot/wcwidth_1759968499540/work
