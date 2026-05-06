@@ -5,6 +5,7 @@ import mmh3
 from math import log, pi, sqrt
 from statistics import NormalDist
 from scipy.optimize import minimize, Bounds
+from scipy.stats import norm
 import pickle
 import numpy as np
 import random
@@ -164,9 +165,32 @@ def m_t(inputs, N, m_0):  ## the m_t function as a target function
     # return -m to maximise the amount of points with optimiser
     return -m
 
+    # K_js = inputs[1:]
+    # m = (m_0)
+    # nd = NormalDist()
+
+    # a = 1 - 1/N
+    # b = 1 - 2/N
+    # pi_8 = np.pi / 8
+    # pi_4 = np.pi / 4
+
+    # for k in K_js:
+    #     E1 = a ** m
+    #     E2 = b ** m
+    #     average = N * (1 - E1)
+
+    #     variance = N * ((N - 1) * E2 + E1 - N * E1**2)
+    #     sd = np.sqrt(np.maximum(variance, 0))
+
+    #     p = (k - pi_8) / (k - pi_4 + 1)
+    #     p = np.clip(p, 1e-12, 1 - 1e-12)  # numerical safety for inv_cdf
+    #     m = average + nd.inv_cdf(p) * sd
+
+    # return -m
+
 ## define the objective and target functions
 def cost(inputs, N, m_0):  ## the cost calculation function as objective function to be minimized
-    ### the input variables to find are as follows:
+    # ### the input variables to find are as follows:
     # input[0] is the number of starting points
     # input[1:] is the K_j for all 1<=j<=t
     K_js = inputs[1:]  # K_j values
@@ -196,8 +220,38 @@ def cost(inputs, N, m_0):  ## the cost calculation function as objective functio
     # return cost - not square rooted as we are bounding cost
     return cost, m_values
 
+    # nd = NormalDist()
+    # K_js = inputs[1:]
+    # cost = 0.0
+    # m_values = np.empty(len(K_js) + 1, dtype=float)
+    # m_values[0] = m_0
+    # m = m_0
+
+    # a = 1 - 1/N
+    # b = 1 - 2/N
+    # pi_8 = np.pi / 8
+    # pi_4 = np.pi / 4
+
+    # for idx, k in enumerate(K_js, start=1):
+    #     E1 = a ** m
+    #     E2 = b ** m
+    #     average = N * (1 - E1)
+
+    #     variance = N * ((N - 1) * E2 + E1 - N * E1**2)
+    #     sd = np.sqrt(np.maximum(variance, 0))
+
+    #     cost += m + m * k / 577.44
+
+    #     p = (k - pi_8) / (k - pi_4 + 1)
+    #     p = np.clip(p, 1e-12, 1 - 1e-12)  # numerical safety for inv_cdf
+    #     m = average + nd.inv_cdf(p) * sd
+
+    #     m_values[idx] = m
+
+    # return cost, m_values
+
 def vanilla_cost(N, m_0, t):
-    # keep track of cost
+    # # keep track of cost
     cost = 0
     # set m to be the starting m_0
     m = m_0
@@ -215,14 +269,27 @@ def vanilla_cost(N, m_0, t):
 
     return cost, m_values
 
+    cost = 0.0
+    m_values = np.empty(t + 1, dtype=float)
+    m_values[0] = m_0
+    m = m_0
+    a = 1 - (1 / N)
+    for i in range(t):
+        cost += m
+        m = N * (1 - (a ** m))
+        m_values[i + 1] = m
+
+    return cost, m_values
+
 ###############################################################################################################################
 
 # Optimise 
 # add vcost to bound the optimisation
-def optimise_kj(N, p, alpha, factor, lower_bound, t=-1):   # add v_cost if want vanilla cost to be set beforehand
+def optimise_kj(N, p, alpha, factor, lower_bound, t=-1, maxiter=5000000):   # add v_cost if want vanilla cost to be set beforehand
 
     if t == -1:
         t = round(log(1-p)/log(1-N**(-1/3))) # Calculate t
+
     mt_max = (2*N)/(t+2)
     mt_target = alpha * mt_max
     if alpha == 1:
@@ -250,10 +317,39 @@ def optimise_kj(N, p, alpha, factor, lower_bound, t=-1):   # add v_cost if want 
     ## call the optimizer
     # maximise the 
     # 5000000 normally
-    res = minimize(lambda Kj: m_t(Kj, N, m_0), starting_values, bounds=bound, constraints=ineq_cons,method = "SLSQP", options={'disp': True, "maxiter": 5000000, "eps": 1, "ftol": 1})
+    res = minimize(lambda Kj: m_t(Kj, N, m_0), starting_values, bounds=bound, constraints=ineq_cons,method = "SLSQP", options={'disp': True, "maxiter": maxiter, "eps": 1, "ftol": 1})
     
     ## res.x is the result of the optimization
     final_cost, m_values = cost(res.x, N, m_0) # calculate the final cost and m values
+    return res.x, m_0, final_cost, m_values
+
+    # bounds as numpy arrays
+    bound = Bounds(
+        np.full(t, lower_bound, dtype=float),
+        np.full(t, np.inf, dtype=float)
+    )
+
+    # vanilla cost baseline
+    v_cost, _ = vanilla_cost(N, m_0, t)
+    v_cost *= factor
+
+    ineq_cons = {
+        'type': 'ineq',
+        'fun': lambda x: v_cost - cost(x, N, m_0)[0]
+    }
+
+    starting_values = np.ones(t, dtype=float)
+
+    res = minimize(
+        lambda Kj: m_t(Kj, N, m_0),
+        starting_values,
+        bounds=bound,
+        constraints=ineq_cons,
+        method="SLSQP",
+        options={'disp': True, "maxiter": maxiter, "eps": 1, "ftol": 1}
+    )
+
+    final_cost, m_values = cost(res.x, N, m_0)
     return res.x, m_0, final_cost, m_values
 
 
