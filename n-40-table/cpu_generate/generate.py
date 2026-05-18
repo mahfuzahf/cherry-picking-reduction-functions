@@ -164,7 +164,7 @@ def _compile_hash_lib() -> str:
 
 _LIB_PATH = _compile_hash_lib()
 
-# load library, lowkey don't know how this works but ut does 
+# load library 
 def _load_lib() -> ctypes.CDLL:
     lib = ctypes.CDLL(_LIB_PATH)
     lib.hash_reduce_array.restype  = None
