@@ -47,7 +47,7 @@ for lab, N in enumerate(Ns):
         expected_mts = []
         # mt-max = 2N/t+2
         # mt = alpha * mt-max
-        t = round(log(1-p)/log(1-N**(-1/3)))
+        # t = round(log(1-p)/log(1-N**(-1/3)))
         mt_max = (2*N)/(t + 2)
         for alpha in alphas:
             expected_mts.append(round(alpha * mt_max))
