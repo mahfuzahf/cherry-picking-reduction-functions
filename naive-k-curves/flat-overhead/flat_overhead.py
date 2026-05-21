@@ -14,10 +14,10 @@ import csv
 # Constants
 ###############################################################################
 
-N     = 2 ** 24 
+N     = 2 ** 32 
 alpha = 0.8
-t     = 2 ** 8
-CORES = 16          # physical cores on the high-mem node
+t     = 10000
+CORES = 96          # physical cores on the high-mem node
 
 T_r = 0.01
 
@@ -381,7 +381,7 @@ _worker_lib = None
 def _worker_init(lib_path: str):
     """Load the C library once per worker process at pool startup."""
     global _worker_lib
-    import ctypes
+    # import ctypes
     _worker_lib = ctypes.CDLL(lib_path)
 
     _worker_lib.sha256_array.restype  = None
@@ -415,9 +415,9 @@ def _sha256_chunk(
     digest_shm[start*32 : (start+length)*32].
     No seed needed — digests are seed-independent.
     """
-    from multiprocessing import shared_memory
-    import numpy as np
-    import ctypes
+    # from multiprocessing import shared_memory
+    # import numpy as np
+    # import ctypes
 
     col_shm    = shared_memory.SharedMemory(name=col_shm_name)
     digest_shm = shared_memory.SharedMemory(name=digest_shm_name)
@@ -471,9 +471,9 @@ def _count_seeds(
     if len(seed_batch) == 0:
         return None, -1
 
-    from multiprocessing import shared_memory
-    import numpy as np
-    import ctypes
+    # from multiprocessing import shared_memory
+    # import numpy as np
+    # import ctypes
 
     digest_shm = shared_memory.SharedMemory(name=digest_shm_name)
     digests    = np.ndarray((n_points * 32,), dtype=np.uint8, buffer=digest_shm.buf)
@@ -612,7 +612,7 @@ def build(m0, t):
 
     col_shm_arr = np.ndarray(current_column.shape, dtype=np.uint64, buffer=col_shm.buf)
 
-    ctx = mp.get_context('spawn')
+    ctx = mp.get_context('fork')
 
     try:
         with ctx.Pool(
